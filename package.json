@@ -1,0 +1,22 @@
+{
+  "name": "discord-poker-bot",
+  "version": "1.0.0",
+  "description": "A discord bot built on Node.js for simple Hold'em",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kimjeff49/discord-poker-bot.git"
+  },
+  "author": "Jeff Kim, Tim Chun, Jhonny Guo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kimjeff49/discord-poker-bot/issues"
+  },
+  "homepage": "https://github.com/kimjeff49/discord-poker-bot#readme",
+  "dependencies": {
+    "discord.js": "^12.3.1"
+  }
+}
