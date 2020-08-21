@@ -183,7 +183,6 @@ client.on('message', (msg) => {
 
 client.on('message', (msg, value = 50) => {
   if (msg.content === '!add') {
-    // console.log(dbcommands.profileExists(db, msg.author.username))
     if (dbcommands.profileExists(db, msg.author.username)) {
       dbcommands.setChips(db, msg.author.username, value);
       msg.channel.send(`Added ${value} chips to your account!`);
