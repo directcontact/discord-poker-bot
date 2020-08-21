@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 require('dotenv').config();
 const sqlite3 = require('sqlite3').verbose();
-const constants = require('./util/poker-constants');
+const constants = require('./constants/poker-constants');
 const { initializeDeck } = require('./poker');
 const MAX_PLAYERS = 2;
 
