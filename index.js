@@ -1,6 +1,4 @@
 const Discord = require('discord.js');
-const fs = require('fs');
-const _ = require('lodash');
 const client = new Discord.Client();
 require('dotenv').config();
 const sqlite3 = require('sqlite3').verbose();
@@ -14,7 +12,7 @@ let db = new sqlite3.Database(':memory:', (err) => {
 });
 
 db.run(
-  'CREATE TABLE users (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, count INTEGER);',
+  'CREATE TABLE users (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER);',
   (err) => {
     if (err) {
       return console.error(err.message);
