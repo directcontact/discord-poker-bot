@@ -2,6 +2,8 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 require('dotenv').config();
 const sqlite3 = require('sqlite3').verbose();
+const constants = require('./util/poker-constants');
+const { initializeDeck } = require('./poker');
 const MAX_PLAYERS = 2;
 
 var gameState = {
@@ -26,21 +28,17 @@ db.run(
     console.log('Created table users!');
   }
 );
-
 // Login
-client.on('ready', () => {
+client.once('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
-// Display pfp
-client.on('message', (msg) => {
-  const split = msg.content.split(' ');
-  if (split[0] === '!avatar') {
-    const users = msg.mentions.users;
-    users.map((user) => {
-      msg.reply(user.avatarURL());
-    });
-  }
+client.once('reconnecting', () => {
+  console.log('Reconnecting!');
+});
+
+client.once('disconnect', () => {
+  console.log('Disconnected!');
 });
 
 // Start poker game
@@ -50,7 +48,6 @@ client.on('message', (msg) => {
     msg.channel.send('The game will start');
     // ch.send('The game will start!\nType !play to join!')
     gameState.status = true;
-
     //channel.send('The game will start! \n Type !play to join!')
   }
 });
