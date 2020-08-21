@@ -4,7 +4,7 @@
   "description": "A discord bot built on Node.js for simple Hold'em",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,9 @@
   },
   "homepage": "https://github.com/kimjeff49/discord-poker-bot#readme",
   "dependencies": {
-    "discord.js": "^12.3.1"
+    "discord.js": "^12.3.1",
+    "dotenv": "^8.2.0",
+    "lodash": "^4.17.20",
+    "sqlite3": "^5.0.0"
   }
 }
