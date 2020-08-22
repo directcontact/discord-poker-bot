@@ -6,6 +6,7 @@ const constants = require('./constants/poker-constants');
 const { initializeDeck } = require('./poker');
 const dbcommands = require('./db-commands');
 const { profileExists } = require('./db-commands');
+const { ACE_OF_D } = require('./constants/poker-constants');
 const MAX_PLAYERS = 2;
 
 var gameState = {
@@ -183,12 +184,30 @@ client.on('message', (msg) => {
 
 client.on('message', (msg, value = 50) => {
   if (msg.content === '!add') {
-    if (dbcommands.profileExists(db, msg.author.username)) {
-      dbcommands.setChips(db, msg.author.username, value);
-      msg.channel.send(`Added ${value} chips to your account!`);
-    } else {
-      msg.channel.send('You do not have a profile yet!');
-    }
+    dbcommands.profileExists(db, msg.author.username).then((exists) => {
+      console.log(exists);
+      if (exists) {
+        dbcommands.setChips(db, msg.author.username, value);
+        msg.channel.send(`Added ${value} chips to your account!`);
+      } else {
+        msg.channel.send('You do not have a profile yet!');
+      }
+    });
+  }
+});
+
+//Sends private message to user
+client.on('message', (msg) => {
+  if (msg.content === '!dm') {
+    msg.author.createDM().then(() => {
+      const channel = client.channels.cache.find(
+        (channel) =>
+          channel.type === 'dm' &&
+          channel.recipient.username === msg.author.username
+      );
+      const pokerEmbed = new Discord.MessageEmbed().setThumbnail(ACE_OF_C);
+      client.channels.cache.get(channel.id).send(pokerEmbed);
+    });
   }
 });
 
