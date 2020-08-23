@@ -1,4 +1,11 @@
 module.exports = {
+  createProfileTable(db) {
+    const query = db.prepare(
+      'CREATE TABLE profiles (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER);'
+    );
+    query.run();
+  },
+
   getChips(db, user) {
     let chipVal = 0;
     db.get(`SELECT chips FROM profiles WHERE name='${user}';`, (err, chips) => {
@@ -23,8 +30,8 @@ module.exports = {
   },
 
   profileExists(db, user) {
-    let query = db.prepare(`SELECT name FROM profiles WHERE name='${user}';`);
-    const valid = query.get();
+    let query = db.prepare(`SELECT name FROM profiles WHERE name=?;`);
+    const valid = query.get(user);
     return valid !== undefined;
   },
 
@@ -36,6 +43,6 @@ module.exports = {
 
   addProfile(db, user) {
     let query = db.prepare('INSERT INTO profiles(name, chips) VALUES (?,?)');
-    query.run([user, 0]);
+    query.run(user, 0);
   },
 };

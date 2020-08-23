@@ -3,26 +3,25 @@ const Database = require('better-sqlite3');
 require('dotenv').config();
 
 const constants = require('./constants/poker-constants');
-const poker = require('./poker');
+const pokercommands = require('./poker-commands');
 const dbcommands = require('./db-commands');
+const { createProfileTable } = require('./db-commands');
 
 const client = new Discord.Client();
 const db = new Database(':memory:', { verbose: console.log });
 
 const MAX_PLAYERS = 2;
 
+let deck = pokercommands.initializeDeck(constants);
+
 var gameState = {
   status: false,
 };
 
-const query = db.prepare(
-  'CREATE TABLE profiles (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER);'
-);
-query.run();
-
 // Login
 client.once('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  createProfileTable(db);
 });
 
 client.once('reconnecting', () => {
@@ -85,8 +84,13 @@ client.on('message', (msg) => {
 
 client.on('message', (msg) => {
   if (msg.content === '!chips') {
-    let chips = dbcommands.getChips(db, msg.author.username);
-    msg.channel.send(`${msg.author.username} has ${chips} chips!`);
+    let exists = dbcommands.profileExists(db, msg.author.username);
+    if (exists) {
+      let chips = dbcommands.getChips(db, msg.author.username);
+      msg.channel.send(`${msg.author.username} has ${chips} chips!`);
+    } else {
+      msg.channel.send('You do not have a profile yet!');
+    }
   }
 });
 
@@ -111,10 +115,18 @@ client.on('message', (msg) => {
           channel.type === 'dm' &&
           channel.recipient.username === msg.author.username
       );
-      const pokerEmbed = new Discord.MessageEmbed().setThumbnail(
-        constants.ACE_OF_D
-      );
-      client.channels.cache.get(channel.id).send(pokerEmbed);
+
+      client.channels.cache.get(channel.id).send('Here are your cards!', {
+        files: pokercommands.removeRandomCardsFromDeck(deck, 2),
+      });
+    });
+  }
+});
+
+client.on('message', (msg) => {
+  if (msg.content === '!deal') {
+    msg.channel.send('Here are the first three for the river.', {
+      files: pokercommands.removeRandomCardsFromDeck(deck, 3),
     });
   }
 });
@@ -123,6 +135,18 @@ client.on('message', (msg) => {
 client.on('message', (msg, value = 1) => {
   if (msg.content === '!purge') {
     console.log(msg.channel.messages.cache);
+  }
+});
+
+client.on('message', (msg) => {
+  if (msg.author.bot) return;
+  if (
+    msg.content.search('rework') >= 0 ||
+    msg.content.search('refactor') >= 0
+  ) {
+    msg.channel.send('Did you say, rework?', {
+      files: ['./images/smallgif.gif'],
+    });
   }
 });
 
