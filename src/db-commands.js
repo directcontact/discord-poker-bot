@@ -12,29 +12,30 @@ module.exports = {
 
   setChips(db, user, value) {
     let update = this.getChips(db, user) + value;
-    db.run(
-      `UPDATE profiles SET chips='${update}' WHERE name='${user}';`,
-      (err) => {
-        if (err) {
-          return console.log(err.message);
-        }
-      }
-    );
+    let query = db.prepare(`UPDATE profiles SET chips=? WHERE name=?;`);
+    query.run(update, user);
   },
 
-  async profileExists(db, user) {
-    let valid = false;
-    await db.get(
-      `SELECT name FROM profiles WHERE name='${user}';`,
-      (err, name) => {
-        if (err) {
-          console.log(err.message);
-        }
-        if (name !== undefined) {
-          valid = true;
-        }
-      }
-    );
-    return valid;
+  getChips(db, user) {
+    let query = db.prepare(`SELECT chips FROM profiles WHERE name=?;`);
+    let chips = query.get(user);
+    return chips.chips;
+  },
+
+  profileExists(db, user) {
+    let query = db.prepare(`SELECT name FROM profiles WHERE name='${user}';`);
+    const valid = query.get();
+    return valid !== undefined;
+  },
+
+  getUserCount(db) {
+    let query = db.prepare(`SELECT COUNT(DISTINCT name) FROM profiles;`);
+    const result = query.get();
+    return result[Object.keys(result)[0]];
+  },
+
+  addProfile(db, user) {
+    let query = db.prepare('INSERT INTO profiles(name, chips) VALUES (?,?)');
+    query.run([user, 0]);
   },
 };
