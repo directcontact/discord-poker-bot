@@ -3,9 +3,9 @@ const Database = require('better-sqlite3');
 require('dotenv').config();
 
 const constants = require('./constants/poker-constants');
-const pokercommands = require('./poker-commands');
-const dbcommands = require('./db-commands');
-const { createProfileTable } = require('./db-commands');
+const pokercommands = require('./poker');
+const queries = require('./db-queries');
+const { createProfileTable } = require('./db-queries');
 
 const client = new Discord.Client();
 const db = new Database(':memory:', { verbose: console.log });
@@ -51,8 +51,7 @@ client.on('message', (msg) => {
   if (msg.content === '!play') {
     if (gameState.status === true) {
       //Adds user to poker table
-
-      let count = dbcommands.getUserCount(db);
+      let count = queries.getUserCount(db);
 
       if (count === MAX_PLAYERS) {
         msg.channel.send('The game is full');
@@ -73,10 +72,10 @@ client.on('message', (msg) => {
 });
 
 client.on('message', (msg) => {
-  if (msg.content === '!poker') {
-    let exists = dbcommands.profileExists(db, msg.author.username);
+  if (msg.content === '!newprofile') {
+    let exists = queries.profileExists(db, msg.author.username);
     if (!exists) {
-      dbcommands.addProfile(db, msg.author.username);
+      queries.addProfile(db, msg.author.username);
       msg.channel.send(`Profile created for ${msg.author.username}!`);
     }
   }
@@ -84,9 +83,9 @@ client.on('message', (msg) => {
 
 client.on('message', (msg) => {
   if (msg.content === '!chips') {
-    let exists = dbcommands.profileExists(db, msg.author.username);
+    let exists = queries.profileExists(db, msg.author.username);
     if (exists) {
-      let chips = dbcommands.getChips(db, msg.author.username);
+      let chips = queries.getChips(db, msg.author.username);
       msg.channel.send(`${msg.author.username} has ${chips} chips!`);
     } else {
       msg.channel.send('You do not have a profile yet!');
@@ -96,9 +95,9 @@ client.on('message', (msg) => {
 
 client.on('message', (msg, value = 50) => {
   if (msg.content === '!add') {
-    let exists = dbcommands.profileExists(db, msg.author.username);
+    let exists = queries.profileExists(db, msg.author.username);
     if (exists) {
-      dbcommands.setChips(db, msg.author.username, value);
+      queries.setChips(db, msg.author.username, value);
       msg.channel.send(`Added ${value} chips to your account!`);
     } else {
       msg.channel.send('You do not have a profile yet!');
