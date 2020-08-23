@@ -4,6 +4,31 @@ module.exports = {
     // let update = this.getChips(db, user, table) + parseInt(value);
     let query = db.prepare(command);
     query.run(value, user);
+  }, 
+
+  createProfileTable(db) {
+    const query = db.prepare(
+      'CREATE TABLE profiles (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER);'
+    );
+    query.run();
+  },
+
+  createPlayerTable(db) {
+    const query = db.prepare(
+      `CREATE TABLE players (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER);`
+    );
+    query.run();
+  },
+
+  getChips(db, user) {
+    let chipVal = 0;
+    db.get(`SELECT chips FROM profiles WHERE name='${user}';`, (err, chips) => {
+      if (err) {
+        console.log(err.message);
+      }
+      chipVal = chips;
+    });
+    return chipVal;
   },
 
   getChips(db, user, table) {
