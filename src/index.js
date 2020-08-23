@@ -6,7 +6,7 @@ const constants = require('./constants/poker-constants');
 const { initializeDeck } = require('./poker');
 const dbcommands = require('./db-commands');
 const { profileExists } = require('./db-commands');
-const { ACE_OF_D } = require('./constants/poker-constants');
+const { ACE_OF_C } = require('./constants/poker-constants');
 const MAX_PLAYERS = 2;
 
 var gameState = {
@@ -210,6 +210,10 @@ client.on('message', (msg) => {
     });
   }
 });
+
+//random number generator 
+
+
 
 // Purge messages
 client.on('message', (msg, value = 1) => {
