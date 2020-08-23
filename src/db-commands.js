@@ -37,5 +37,30 @@ module.exports = {
     let command = `DELETE FROM ${table};`;
     let query = db.prepare(command);
     query.run();
+  },
+
+  getID(db, user, table) {
+    let command = `SELECT id FROM ${table} WHERE name=?;`;
+    let query = db.prepare(command);
+    const result = query.get(user);
+    return result[Object.keys(result)[0]];
+  },
+
+  removeTableEntry(db, id, table) {
+    let command = `DELETE FROM ${table} WHERE id=?;`;
+    let query = db.prepare(command);
+    query.run(id);
+  },
+
+  listPlayers(db, table) {
+    let players = [];
+    let command = `SELECT name FROM ${table};`;
+    let query = db.prepare(command);
+    
+    for (const player of query.iterate()) {
+      players.push(player.name);
+    }
+
+    return players;
   }
 };

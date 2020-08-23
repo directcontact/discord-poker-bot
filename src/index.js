@@ -14,9 +14,10 @@ const MAX_PLAYERS = 2;
 const PROFILES = 'profiles'
 const PLAYERS = 'players'
 
-var gameState = {
+let gameState = {
   status: false,
 };
+let pot = 0;
 
 const query = db.prepare(
   'CREATE TABLE profiles (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER);'
@@ -81,6 +82,7 @@ client.on('message', (msg) => {
 client.on('message', (msg) => {
   if (msg.content === '!end') {
     gameState.status = false;
+    pot = 0;2
     dbcommands.deleteTable(db, 'players')
     msg.channel.send('Game has ended');
   }
@@ -92,6 +94,9 @@ client.on('message', (msg) => {
     if (!exists) {
       dbcommands.addTableEntry(db, msg.author.username, 'profiles');
       msg.channel.send(`Profile created for ${msg.author.username}!`);
+    }
+    else {
+      msg.channel.send('Profile already exists.');
     }
   }
 });
@@ -169,21 +174,48 @@ client.on('message', (msg) => {
   }
 })
 
-//Sends private message to user
 client.on('message', (msg) => {
-  if (msg.content === '!dm') {
-    msg.author.createDM().then(() => {
-      const channel = client.channels.cache.find(
-        (channel) =>
-          channel.type === 'dm' &&
-          channel.recipient.username === msg.author.username
-      );
-      const pokerEmbed = new Discord.MessageEmbed().setThumbnail(
-        constants.ACE_OF_D
-      );
-      client.channels.cache.get(channel.id).send(pokerEmbed);
-    });
+  if (msg.content === '!quit') {
+    if (dbcommands.tableEntryExists(db, msg.author.username, PLAYERS)) {
+      let playerID = dbcommands.getID(db, msg.author.username, PLAYERS);
+      dbcommands.removeTableEntry(db, playerID, PLAYERS);
+      msg.channel.send(`${msg.author.username} has left the table.`);
+    }
+    else {
+      msg.channel.send('Youre not in the game.');
+    }
   }
-});
+})
+
+//Sends private message to user
+// client.on('message', (msg) => {
+//   if (msg.content === '!dm') {
+//     msg.author.createDM().then(() => {
+//       const channel = client.channels.cache.find(
+//         (channel) =>
+//           channel.type === 'dm' &&
+//           channel.recipient.username === msg.author.username
+//       );
+//       const pokerEmbed = new Discord.MessageEmbed().setThumbnail(
+//         constants.ACE_OF_D
+//       );
+//       client.channels.cache.get(channel.id).send(pokerEmbed);
+//     });
+//   }
+// });
+
+client.on('message', (msg) => {
+  if (msg.content === '!id') {
+    console.log('Profiles: ' + dbcommands.getID(db, msg.author.username, PROFILES));
+    console.log('Players: ' + dbcommands.getID(db, msg.author.username, PLAYERS));
+  }
+  if (msg.content === '!list') {
+    let players = dbcommands.listPlayers(db, PROFILES);
+    
+    for (let i = 0; i < players.length; i++) {
+      msg.channel.send((i + 1) + '. ' + players[i]);
+    }
+  }
+})
 
 client.login(process.env.CLIENT_ID);
