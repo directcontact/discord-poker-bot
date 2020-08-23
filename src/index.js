@@ -50,13 +50,13 @@ client.on('message', (msg) => {
   if (msg.content === '!play') {
     if (gameState.status === true) {
       if (tableEntryExists(db, msg.author.username, PROFILES)) {
-        let count = dbcommands.getUserCount(db, 'players');
+        let count = dbcommands.getUserCount(db, PLAYERS);
 
         if (count === MAX_PLAYERS) {
           msg.channel.send('The game is full');
         }
         else {
-          if (dbcommands.tableEntryExists(db, msg.author.username, 'players')) {
+          if (dbcommands.tableEntryExists(db, msg.author.username, PLAYERS)) {
             msg.channel.send('Youre already in')
           }
           else {
@@ -81,16 +81,16 @@ client.on('message', (msg) => {
   if (msg.content === '!end') {
     gameState.status = false;
     pot = 0;2
-    dbcommands.deleteTable(db, 'players')
+    dbcommands.deleteTable(db, PLAYERS)
     msg.channel.send('Game has ended');
   }
 });
 
 client.on('message', (msg) => {
   if (msg.content === '!poker') {
-    let exists = dbcommands.tableEntryExists(db, msg.author.username, 'profiles');
+    let exists = dbcommands.tableEntryExists(db, msg.author.username, PROFILES);
     if (!exists) {
-      dbcommands.addTableEntry(db, msg.author.username, 'profiles');
+      dbcommands.addTableEntry(db, msg.author.username, PROFILES);
       msg.channel.send(`Profile created for ${msg.author.username}!`);
     }
     else {
@@ -113,9 +113,9 @@ client.on('message', (msg) => {
 
 client.on('message', (msg, value = 50) => {
   if (msg.content === '!add') {
-    let exists = dbcommands.tableEntryExists(db, msg.author.username, 'profiles');
+    let exists = dbcommands.tableEntryExists(db, msg.author.username, PROFILES);
     if (exists) {
-      dbcommands.setChips(db, msg.author.username, value, 'profiles');
+      dbcommands.setChips(db, msg.author.username, value, PROFILES);
       msg.channel.send(`Added ${value} chips to your account!`);
     } else {
       msg.channel.send('You do not have a profile yet!');
@@ -220,6 +220,7 @@ client.on('message', (msg) => {
   }
 })
 
+// vERY iMPOrTANt ---- DONT DELETE
 client.on('message', (msg) => {
   if (msg.author.bot) return;
   if (
