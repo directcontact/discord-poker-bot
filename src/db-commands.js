@@ -38,6 +38,13 @@ module.exports = {
     return parseInt(chips.chips);
   },
 
+  addChips(db, user, value, table) {
+    let sum = parseInt(value) + this.getChips(db, user, table);
+    let command = `UPDATE ${table} SET chips=? WHERE name=?;`;
+    let query = db.prepare(command);
+    query.run(sum, user);
+  },
+
   tableEntryExists(db, user, table) {
     let command = `SELECT name FROM ${table} WHERE name=?;`;
     let query = db.prepare(command);
@@ -87,5 +94,18 @@ module.exports = {
     }
 
     return players;
+  },
+
+  transferChips(db, user, value, originTable, destinationTable) {
+    this.addChips(db, user, value, destinationTable);
+    this.addChips(db, user, -Math.abs(value), originTable);
+  },
+
+  cashOutChips(db, users) {
+    for (name of users) {
+      let chips = this.getChips(db, name, 'players');
+      this.transferChips(db, name, chips, 'players', 'profiles');
+      console.log('Transferred ' + chips + ' to ' + name); 
+    }
   }
 };

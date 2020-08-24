@@ -12,8 +12,9 @@ const client = new Discord.Client();
 const db = new Database(':memory:', { verbose: console.log });
 
 const MAX_PLAYERS = 2;
-const PROFILES = 'profiles'
-const PLAYERS = 'players'
+const PROFILES = 'profiles';
+const PLAYERS = 'players';
+const PREFIX = '!';
 
 let deck = pokercommands.initializeDeck(constants);
 
@@ -36,32 +37,45 @@ client.once('disconnect', () => {
   console.log('Disconnected!');
 });
 
-// Start poker game
+
 client.on('message', (msg) => {
-  if (msg.content === '!start') {
+  if (msg.author.bot) return;
+  if (!msg.content.startsWith(PREFIX)) return;
+
+  const args = msg.content.slice(PREFIX.length).trim().split(' ');
+  const command = args.shift().toLowerCase();
+
+  if (command === 'poker') {
+    let exists = dbcommands.tableEntryExists(db, msg.author.username, PROFILES);
+    if (!exists) {
+      dbcommands.addTableEntry(db, msg.author.username, PROFILES);
+      msg.channel.send(`Profile created for ${msg.author.username}!`);
+    }
+    else {
+      msg.channel.send('Profile already exists.');
+    }
+  }
+
+  if (command === 'start') {
     msg.channel.send('The game will start');
     gameState.status = true;
     dbcommands.createPlayerTable(db);
   }
-});
 
-// Join poker game
-client.on('message', (msg) => {
-  if (msg.content === '!play') {
+  if (command === 'play') {
     if (gameState.status === true) {
       if (tableEntryExists(db, msg.author.username, PROFILES)) {
-        let count = dbcommands.getUserCount(db, 'players');
+        let count = dbcommands.getUserCount(db, PLAYERS);
 
         if (count === MAX_PLAYERS) {
           msg.channel.send('The game is full');
         }
         else {
-          if (dbcommands.tableEntryExists(db, msg.author.username, 'players')) {
+          if (dbcommands.tableEntryExists(db, msg.author.username, PLAYERS)) {
             msg.channel.send('Youre already in')
           }
           else {
             dbcommands.addTableEntry(db, msg.author.username, PLAYERS);
-            console.log('Chips: ' + dbcommands.getChips(db, msg.author.username, PLAYERS))
             msg.channel.send(`(${count + 1}/${MAX_PLAYERS}) ${msg.author.username} has joined!\nType !play to join!`);
           }
         }
@@ -74,33 +88,30 @@ client.on('message', (msg) => {
       msg.channel.send('A game hasnt started stupid');
     } 
   }
-});
 
-// End poker game
-client.on('message', (msg) => {
-  if (msg.content === '!end') {
+  if (command === 'end') {
     gameState.status = false;
-    pot = 0;2
-    dbcommands.deleteTable(db, 'players')
+    pot = 0;
+    dbcommands.cashOutChips(db, dbcommands.listPlayers(db, PLAYERS))
+    dbcommands.deleteTable(db, PLAYERS)
     msg.channel.send('Game has ended');
   }
-});
 
-client.on('message', (msg) => {
-  if (msg.content === '!poker') {
-    let exists = dbcommands.tableEntryExists(db, msg.author.username, 'profiles');
-    if (!exists) {
-      dbcommands.addTableEntry(db, msg.author.username, 'profiles');
-      msg.channel.send(`Profile created for ${msg.author.username}!`);
+  if (command === 'add') {
+    let value = 50;
+    if (args.length !== 0) {
+      value = parseInt(args[0]);
     }
-    else {
-      msg.channel.send('Profile already exists.');
+    let exists = dbcommands.tableEntryExists(db, msg.author.username, PROFILES);
+    if (exists) {
+      dbcommands.addChips(db, msg.author.username, value, PROFILES);
+      msg.channel.send(`Added ${value} chips to your account!`);
+    } else {
+      msg.channel.send('You do not have a profile yet!');
     }
   }
-});
 
-client.on('message', (msg) => {
-  if (msg.content === '!bank') {
+  if (command === 'bank') {
     if (dbcommands.tableEntryExists(db, msg.author.username, PROFILES)) {
       let chips = dbcommands.getChips(db, msg.author.username, PROFILES);
       msg.reply(`You have ${chips} chips in the bank!`);
@@ -109,39 +120,18 @@ client.on('message', (msg) => {
       msg.send('You dont have a profile yet.')
     }
   }
-});
 
-client.on('message', (msg, value = 50) => {
-  if (msg.content === '!add') {
-    let exists = dbcommands.tableEntryExists(db, msg.author.username, 'profiles');
-    if (exists) {
-      dbcommands.setChips(db, msg.author.username, value, 'profiles');
-      msg.channel.send(`Added ${value} chips to your account!`);
-    } else {
-      msg.channel.send('You do not have a profile yet!');
-    }
-  }
-});
-
-client.on('message', (msg, value = 20) => {
-  const withdraw = '!withdraw';
-  if (msg.content.startsWith(withdraw)) {
-    const args = msg.content.slice(withdraw.length).trim().split(" ");
-    if (args[0] != '') {
-      value = parseInt(args[0]);
-    }
+  if (command === 'withdraw') {
+    let value = 20;
 
     if (gameState.status === true) {
       let playerExists = dbcommands.tableEntryExists(db, msg.author.username, PLAYERS);
 
-      if (playerExists) {
-        const args = msg.content.slice(withdraw.length).trim().split(" ");
-      
-        if (args[0] != '') {
+      if (playerExists) {      
+        if (args.length !== 0) {
           value = parseInt(args[0]);
         }
   
-        console.log('Chips: ' + dbcommands.getChips(db, msg.author.username, PROFILES));
         if (value > dbcommands.getChips(db, msg.author.username, PROFILES)) {
           msg.reply('You dont have that many chips');
         }
@@ -149,10 +139,10 @@ client.on('message', (msg, value = 20) => {
           msg.reply('why?');
         }
         else {
-          dbcommands.setChips(db, msg.author.username, dbcommands.getChips(db, msg.author.username, PROFILES) - value, PROFILES);
-          dbcommands.setChips(db, msg.author.username, dbcommands.getChips(db, msg.author.username, PLAYERS) + value, PLAYERS);
+          dbcommands.transferChips(db, msg.author.username, value, PROFILES, PLAYERS);
+          // dbcommands.setChips(db, msg.author.username, dbcommands.getChips(db, msg.author.username, PROFILES) - value, PROFILES);
+          // dbcommands.setChips(db, msg.author.username, dbcommands.getChips(db, msg.author.username, PLAYERS) + value, PLAYERS);
           msg.reply(`Transferred ${value} chips!`)
-          console.log(dbcommands.getChips(db, msg.author.username, PLAYERS));
         }
       }
       else {
@@ -163,14 +153,18 @@ client.on('message', (msg, value = 20) => {
       msg.channel.send('The game hasnt started yet.');
     }
   }
-})
 
-client.on('message', (msg) => {
-  if (msg.content === '!chips') {
-    let chips = dbcommands.getChips(db, msg.author.username, PLAYERS);
-    msg.reply(`You have ${chips} chips!`)
+  if (command === 'chips') {
+    if (gameState.status === true) {
+      let chips = dbcommands.getChips(db, msg.author.username, PLAYERS);
+      msg.reply(`You have ${chips} chips!`)
+    }
+    else {
+      msg.channel.send('Game hasnt started')
+    }
   }
-  if (msg.content === '!dm') {
+
+  if (command === 'dm') {
     msg.author.createDM().then(() => {
       const channel = client.channels.cache.find(
         (channel) =>
@@ -183,18 +177,14 @@ client.on('message', (msg) => {
       });
     });
   }
-});
 
-client.on('message', (msg) => {
-  if (msg.content === '!deal') {
+  if (command === 'deal') {
     msg.channel.send('Here are the first three for the river.', {
       files: pokercommands.removeRandomCardsFromDeck(deck, 3),
     });
   }
-})
 
-client.on('message', (msg) => {
-  if (msg.content === '!quit') {
+  if (command === 'quit') {
     if (dbcommands.tableEntryExists(db, msg.author.username, PLAYERS)) {
       let playerID = dbcommands.getID(db, msg.author.username, PLAYERS);
       dbcommands.removeTableEntry(db, playerID, PLAYERS);
@@ -204,22 +194,46 @@ client.on('message', (msg) => {
       msg.channel.send('Youre not in the game.');
     }
   }
-})
 
-client.on('message', (msg) => {
-  if (msg.content === '!id') {
+  if (command === 'id') {
     console.log('Profiles: ' + dbcommands.getID(db, msg.author.username, PROFILES));
     console.log('Players: ' + dbcommands.getID(db, msg.author.username, PLAYERS));
   }
-  if (msg.content === '!list') {
+
+  if (command === 'list') {
     let players = dbcommands.listPlayers(db, PROFILES);
     
     for (let i = 0; i < players.length; i++) {
       msg.channel.send((i + 1) + '. ' + players[i]);
     }
   }
-})
 
+  if (command === 'purge') {
+    const deleteNum = parseInt(args[0]);
+
+    if (!deleteNum || deleteNum < 2 || deleteNum > 100) {
+      return msg.reply('Enter a number between 1 and 99');
+    }
+
+    msg.channel.bulkDelete(deleteNum + 1)
+      .catch(err => {
+        console.log(err);
+      })
+  }
+
+  // if (command === 'l') {
+  //   let textChannels = client.channels.cache.filter(ch => ch.type === 'text');
+
+  //   for (const channel of textChannels) {
+  //     const messages = channel[1].messages.cache;
+  //     for (const message of messages) {
+  //       console.log(message.author.username);
+  //     }
+  //   }
+  // }
+});
+
+// vERY iMPOrTANt ---- DONT DELETE
 client.on('message', (msg) => {
   if (msg.author.bot) return;
   if (
