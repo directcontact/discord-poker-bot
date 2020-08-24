@@ -15,20 +15,9 @@ module.exports = {
 
   createPlayerTable(db) {
     const query = db.prepare(
-      `CREATE TABLE IF NOT EXISTS players (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER);`
+      'CREATE TABLE IF NOT EXISTS players (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER);'
     );
     query.run();
-  },
-
-  getChips(db, user) {
-    let chipVal = 0;
-    db.get(`SELECT chips FROM profiles WHERE name='${user}';`, (err, chips) => {
-      if (err) {
-        console.log(err.message);
-      }
-      chipVal = chips;
-    });
-    return chipVal;
   },
 
   getChips(db, user, table) {
@@ -77,7 +66,7 @@ module.exports = {
     query.run(id);
   },
 
-  listPlayers(db, table) {
+  listRows(db, table) {
     let players = [];
     let command = `SELECT name FROM ${table};`;
     let query = db.prepare(command);

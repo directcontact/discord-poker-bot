@@ -1,22 +1,20 @@
 const Database = require('better-sqlite3');
 const path = require('path');
-const Discord = require('discord.js');
 
 const queries = require('../src/db-queries');
 
 const db = new Database(path.resolve('data/poker.db'));
-const client = new Discord.Client();
 
 module.exports = {
-  name: '',
-  description: '',
+  name: 'quit',
+  description: 'Quits the current game.',
   execute(message, args) {
-    if (queries.tableEntryExists(db, msg.author.username, PLAYERS)) {
-      let playerID = queries.getID(db, msg.author.username, PLAYERS);
+    if (queries.tableEntryExists(db, message.author.username, PLAYERS)) {
+      let playerID = queries.getID(db, message.author.username, PLAYERS);
       queries.removeTableEntry(db, playerID, PLAYERS);
-      msg.channel.send(`${msg.author.username} has left the table.`);
+      message.channel.send(`${message.author.username} has left the table.`);
     } else {
-      msg.channel.send('Youre not in the game.');
+      message.channel.send('Youre not in the game.');
     }
   },
 };

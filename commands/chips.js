@@ -6,10 +6,10 @@ const queries = require('../src/db-queries');
 const db = new Database(path.resolve('data/poker.db'));
 
 module.exports = {
-  name: '',
-  description: '',
-  execute(message, args) {
-    let chips = queries.getChips(db, msg.author.username, PLAYERS);
+  name: 'chips',
+  description: 'Returns the number of chips held by the user.',
+  execute(message) {
+    let chips = queries.getChips(db, message.author.username, PLAYERS);
     message.reply(`You have ${chips} chips!`);
   },
 };

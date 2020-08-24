@@ -3,6 +3,7 @@ const path = require('path');
 const Discord = require('discord.js');
 
 const queries = require('../src/db-queries');
+const { PROFILES, PLAYERS } = require('../constants/game-constants');
 
 const db = new Database(path.resolve('data/poker.db'));
 const client = new Discord.Client();
@@ -11,32 +12,28 @@ module.exports = {
   name: 'play',
   description: 'Allows the user to enter the lobby.',
   execute(message, args) {
-    if (gameState.status === true) {
-      if (tableEntryExists(db, msg.author.username, PROFILES)) {
-        let count = queries.getUserCount(db, 'players');
+    if (tableEntryExists(db, message.author.username, PROFILES)) {
+      let count = queries.getUserCount(db, PLAYERS);
 
-        if (count === MAX_PLAYERS) {
-          msg.channel.send('The game is full');
-        } else {
-          if (queries.tableEntryExists(db, msg.author.username, 'players')) {
-            msg.channel.send('Youre already in');
-          } else {
-            queries.addTableEntry(db, msg.author.username, PLAYERS);
-            console.log(
-              'Chips: ' + queries.getChips(db, msg.author.username, PLAYERS)
-            );
-            msg.channel.send(
-              `(${count + 1}/${MAX_PLAYERS}) ${
-                msg.author.username
-              } has joined!\nType !play to join!`
-            );
-          }
-        }
+      if (count === MAX_PLAYERS) {
+        message.channel.send('The game is full');
       } else {
-        msg.channel.send('You dont have a profile');
+        if (queries.tableEntryExists(db, message.author.username, PLAYERS)) {
+          message.channel.send('Youre already in');
+        } else {
+          queries.addTableEntry(db, message.author.username, PLAYERS);
+          console.log(
+            'Chips: ' + queries.getChips(db, message.author.username, PLAYERS)
+          );
+          message.channel.send(
+            `(${count + 1}/${MAX_PLAYERS}) ${
+              message.author.username
+            } has joined!\nType !play to join!`
+          );
+        }
       }
-    } else if (gameState.status === false) {
-      msg.channel.send('A game hasnt started stupid');
+    } else {
+      message.channel.send('You dont have a profile');
     }
   },
 };

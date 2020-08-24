@@ -10,13 +10,10 @@ module.exports = {
   name: 'withdraw',
   description:
     "Withdraws money from the user's bank and inserts the money into their current holding",
-  execute(message, args) {
-    const withdraw = '!withdraw';
-    if (args[0] != '') {
-      value = parseInt(args[0]);
-    }
+  execute(message, args, state) {
+    const value = parseInt(args[0]);
 
-    if (gameState.status === true) {
+    if (state.status === true) {
       let playerExists = queries.tableEntryExists(
         db,
         msg.author.username,
