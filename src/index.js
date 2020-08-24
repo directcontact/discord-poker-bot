@@ -92,6 +92,7 @@ client.on('message', (msg) => {
   if (command === 'end') {
     gameState.status = false;
     pot = 0;
+    dbcommands.cashOutChips(db, dbcommands.listPlayers(db, PLAYERS))
     dbcommands.deleteTable(db, PLAYERS)
     msg.channel.send('Game has ended');
   }
@@ -103,7 +104,7 @@ client.on('message', (msg) => {
     }
     let exists = dbcommands.tableEntryExists(db, msg.author.username, PROFILES);
     if (exists) {
-      dbcommands.setChips(db, msg.author.username, dbcommands.getChips(db, msg.author.username, PROFILES) + value, PROFILES);
+      dbcommands.addChips(db, msg.author.username, value, PROFILES);
       msg.channel.send(`Added ${value} chips to your account!`);
     } else {
       msg.channel.send('You do not have a profile yet!');
@@ -138,8 +139,9 @@ client.on('message', (msg) => {
           msg.reply('why?');
         }
         else {
-          dbcommands.setChips(db, msg.author.username, dbcommands.getChips(db, msg.author.username, PROFILES) - value, PROFILES);
-          dbcommands.setChips(db, msg.author.username, dbcommands.getChips(db, msg.author.username, PLAYERS) + value, PLAYERS);
+          dbcommands.transferChips(db, msg.author.username, value, PROFILES, PLAYERS);
+          // dbcommands.setChips(db, msg.author.username, dbcommands.getChips(db, msg.author.username, PROFILES) - value, PROFILES);
+          // dbcommands.setChips(db, msg.author.username, dbcommands.getChips(db, msg.author.username, PLAYERS) + value, PLAYERS);
           msg.reply(`Transferred ${value} chips!`)
         }
       }
