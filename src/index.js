@@ -74,6 +74,8 @@ client.on('message', (message) => {
     return message.reply('The game has not begun yet!');
   }
 
+  console.log(args);
+
   if (!cooldowns.has(command.name)) {
     cooldowns.set(command.name, new Discord.Collection());
   }

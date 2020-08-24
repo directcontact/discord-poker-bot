@@ -64,7 +64,7 @@ module.exports = {
     let command = `SELECT id FROM ${table} WHERE name=?;`;
     let query = db.prepare(command);
     const result = query.get(user);
-    return result[Object.keys(result)[0]];
+    return result ? result[Object.keys(result)[0]] : 'N/A';
   },
 
   removeTableEntry(db, id, table) {

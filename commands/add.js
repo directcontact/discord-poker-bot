@@ -8,15 +8,18 @@ const db = new Database(path.resolve('data/poker.db'));
 module.exports = {
   name: 'add',
   description: 'Adds chips to the user',
+  args: true,
   execute(message, args, state) {
+    const value = parseInt(args[0]);
+
     let exists = queries.tableEntryExists(
       db,
       message.author.username,
       'profiles'
     );
     if (exists) {
-      queries.setChips(db, message.author.username, 50, 'profiles');
-      message.channel.send(`Added 50 chips to your account!`);
+      queries.addChips(db, message.author.username, value, 'profiles');
+      message.channel.send(`Added ${value} chips to your account!`);
     } else {
       message.channel.send('You do not have a profile yet!');
     }
