@@ -39,6 +39,7 @@ for (const file of commandFiles) {
 client.on('message', (message) => {
   if (!message.content.startsWith(prefix) || message.author.bot) return;
 
+  // vERY iMPOrTANt ---- DONT DELETE
   if (
     message.content.search('rework') >= 0 ||
     message.content.search('refactor') >= 0
@@ -108,8 +109,6 @@ client.on('message', (message) => {
 client.login(token);
 
 /*
-
-client.on('message', (msg) => {
   if (msg.content === '!dm') {
     msg.author.createDM().then(() => {
       const channel = client.channels.cache.find(
@@ -123,6 +122,16 @@ client.on('message', (msg) => {
       });
     });
   }
-});
 
+  if (command === 'l') {
+    let textChannels = client.channels.cache.filter(ch => ch.type === 'text');
+
+    for (const channel of textChannels) {
+      const messages = channel[1].messages.cache;
+      for (const message of messages) {
+        console.log(message.author.username);
+      }
+    }
+  }
+});
 */
