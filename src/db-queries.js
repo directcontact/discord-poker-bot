@@ -4,18 +4,18 @@ module.exports = {
     // let update = this.getChips(db, user, table) + parseInt(value);
     let query = db.prepare(command);
     query.run(value, user);
-  }, 
+  },
 
   createProfileTable(db) {
     const query = db.prepare(
-      'CREATE TABLE profiles (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER);'
+      'CREATE TABLE IF NOT EXISTS profiles (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER);'
     );
     query.run();
   },
 
   createPlayerTable(db) {
     const query = db.prepare(
-      `CREATE TABLE players (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER);`
+      `CREATE TABLE IF NOT EXISTS players (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER);`
     );
     query.run();
   },
@@ -53,7 +53,7 @@ module.exports = {
   },
 
   addTableEntry(db, user, table) {
-    let command = `INSERT INTO ${table}(name, chips) VALUES (?,?);`
+    let command = `INSERT INTO ${table}(name, chips) VALUES (?,?);`;
     let query = db.prepare(command);
     query.run(user, 0);
   },
@@ -81,11 +81,11 @@ module.exports = {
     let players = [];
     let command = `SELECT name FROM ${table};`;
     let query = db.prepare(command);
-    
+
     for (const player of query.iterate()) {
       players.push(player.name);
     }
 
     return players;
-  }
+  },
 };
