@@ -4,31 +4,20 @@ module.exports = {
     // let update = this.getChips(db, user, table) + parseInt(value);
     let query = db.prepare(command);
     query.run(value, user);
-  }, 
+  },
 
   createProfileTable(db) {
     const query = db.prepare(
-      'CREATE TABLE profiles (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER);'
+      'CREATE TABLE IF NOT EXISTS profiles (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER);'
     );
     query.run();
   },
 
   createPlayerTable(db) {
     const query = db.prepare(
-      `CREATE TABLE players (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER);`
+      'CREATE TABLE IF NOT EXISTS players (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER);'
     );
     query.run();
-  },
-
-  getChips(db, user) {
-    let chipVal = 0;
-    db.get(`SELECT chips FROM profiles WHERE name='${user}';`, (err, chips) => {
-      if (err) {
-        console.log(err.message);
-      }
-      chipVal = chips;
-    });
-    return chipVal;
   },
 
   getChips(db, user, table) {
@@ -60,7 +49,7 @@ module.exports = {
   },
 
   addTableEntry(db, user, table) {
-    let command = `INSERT INTO ${table}(name, chips) VALUES (?,?);`
+    let command = `INSERT INTO ${table}(name, chips) VALUES (?,?);`;
     let query = db.prepare(command);
     query.run(user, 0);
   },
@@ -75,7 +64,7 @@ module.exports = {
     let command = `SELECT id FROM ${table} WHERE name=?;`;
     let query = db.prepare(command);
     const result = query.get(user);
-    return result[Object.keys(result)[0]];
+    return result ? result[Object.keys(result)[0]] : 'N/A';
   },
 
   removeTableEntry(db, id, table) {
@@ -84,11 +73,11 @@ module.exports = {
     query.run(id);
   },
 
-  listPlayers(db, table) {
+  listRows(db, table) {
     let players = [];
     let command = `SELECT name FROM ${table};`;
     let query = db.prepare(command);
-    
+
     for (const player of query.iterate()) {
       players.push(player.name);
     }
@@ -105,7 +94,7 @@ module.exports = {
     for (name of users) {
       let chips = this.getChips(db, name, 'players');
       this.transferChips(db, name, chips, 'players', 'profiles');
-      console.log('Transferred ' + chips + ' to ' + name); 
+      console.log('Transferred ' + chips + ' to ' + name);
     }
-  }
+  },
 };
