@@ -9,12 +9,13 @@ const db = new Database(path.resolve('data/poker.db'));
 module.exports = {
   name: 'bank',
   description: 'Returns your chips that are currently stored in the bank.',
+  game: false,
   execute(message) {
     if (queries.tableEntryExists(db, message.author.username, PROFILES)) {
       let chips = queries.getChips(db, message.author.username, PROFILES);
       message.reply(`You have ${chips} chips in the bank!`);
     } else {
-      message.send('You dont have a profile yet.');
+      message.channel.send('You dont have a profile yet.');
     }
   },
 };

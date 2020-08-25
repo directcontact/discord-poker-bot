@@ -10,6 +10,8 @@ module.exports = {
   name: 'withdraw',
   description:
     "Withdraws money from the user's bank and inserts the money into their current holding.",
+  game: true,
+  args: true, 
   execute(message, args, state) {
     const value = parseInt(args[0]);
 
@@ -20,9 +22,6 @@ module.exports = {
     );
 
     if (playerExists) {
-      console.log(
-        'Chips: ' + queries.getChips(db, message.author.username, PROFILES)
-      );
       if (value > queries.getChips(db, message.author.username, PROFILES)) {
         message.reply('You dont have that many chips');
       } else if (value <= 0) {
@@ -41,7 +40,6 @@ module.exports = {
           PLAYERS
         );
         message.reply(`Transferred ${value} chips!`);
-        console.log(queries.getChips(db, message.author.username, PLAYERS));
       }
     } else {
       message.channel.send('Youre not in the game.');

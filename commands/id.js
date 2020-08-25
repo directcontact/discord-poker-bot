@@ -9,6 +9,7 @@ const db = new Database(path.resolve('data/poker.db'));
 module.exports = {
   name: 'id',
   description: 'Returns the current profile and player ids of the user.',
+  game: false,
   execute(message, args) {
     console.log(
       'Profiles: ' + queries.getID(db, message.author.username, PROFILES)

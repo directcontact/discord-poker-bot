@@ -8,6 +8,7 @@ const db = new Database(path.resolve('data/poker.db'));
 module.exports = {
   name: 'add',
   description: 'Adds chips to the user',
+  game: false,
   args: true,
   execute(message, args, state) {
     const value = parseInt(args[0]);

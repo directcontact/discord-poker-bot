@@ -9,9 +9,11 @@ const db = new Database(path.resolve('data/poker.db'));
 module.exports = {
   name: 'end',
   description: 'Ends the game.',
+  game: true,
   execute(message, args, state) {
     state.status = false;
     queries.deleteTable(db, PLAYERS);
+    queries.cashOutChips(db, queries.listRows(db, PLAYERS));
     message.channel.send('Game has ended');
   },
 };

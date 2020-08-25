@@ -15,6 +15,7 @@ const client = new Discord.Client();
 module.exports = {
   name: 'play',
   description: 'Allows the user to enter the lobby.',
+  game: true,
   execute(message, args) {
     if (queries.tableEntryExists(db, message.author.username, PROFILES)) {
       let count = queries.getUserCount(db, PLAYERS);

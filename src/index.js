@@ -71,7 +71,8 @@ client.on('message', (message) => {
     return message.channel.send(reply);
   }
 
-  if (commandName !== 'start' && !state.status) {
+  if (command.game && !state.status) {
+    console.log(`${state.status}/${command.game}`)
     return message.reply('The game has not begun yet!');
   }
 

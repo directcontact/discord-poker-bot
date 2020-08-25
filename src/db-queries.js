@@ -24,6 +24,7 @@ module.exports = {
     let command = `SELECT chips FROM ${table} WHERE name=?;`;
     let query = db.prepare(command);
     let chips = query.get(user);
+    console.log('Chips: ' + chips.chips)
     return parseInt(chips.chips);
   },
 
@@ -91,10 +92,11 @@ module.exports = {
   },
 
   cashOutChips(db, users) {
-    for (name of users) {
+    users.map((name) => {
+      console.log(name)
       let chips = this.getChips(db, name, 'players');
       this.transferChips(db, name, chips, 'players', 'profiles');
       console.log('Transferred ' + chips + ' to ' + name);
-    }
+    })
   },
 };

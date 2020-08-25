@@ -4,6 +4,7 @@ const constants = require('../constants/poker-constants');
 module.exports = {
   name: 'deal',
   description: 'Deals three cards to the river.',
+  game: true,
   execute(message, args, state, client) {
     state.decks = pokercommands.initializeDeck(constants);
 
