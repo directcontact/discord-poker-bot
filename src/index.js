@@ -3,6 +3,8 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
 
+const { PREFIX } = require('../constants/game-constants');
+
 const client = new Discord.Client();
 const state = {
   status: false,
@@ -36,7 +38,7 @@ for (const file of commandFiles) {
 }
 
 client.on('message', (message) => {
-  if (!message.content.startsWith(prefix) || message.author.bot) return;
+  if (!message.content.startsWith(PREFIX) || message.author.bot) return;
 
   // vERY iMPOrTANt ---- DONT DELETE
   if (
@@ -48,7 +50,7 @@ client.on('message', (message) => {
     });
   }
 
-  const args = message.content.slice(prefix.length).trim().split(/ +/);
+  const args = message.content.slice(PREFIX.length).trim().split(/ +/);
   const commandName = args.shift().toLowerCase();
 
   const command =
@@ -63,7 +65,7 @@ client.on('message', (message) => {
     let reply = `You didn't provide any arguments, ${message.author}!`;
 
     if (command.usage) {
-      reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
+      reply += `\nThe proper usage would be: \`${PREFIX}${command.name} ${command.usage}\``;
     }
 
     return message.channel.send(reply);
