@@ -1,8 +1,7 @@
 const Discord = require('discord.js');
 const path = require('path');
 const fs = require('fs');
-
-const { prefix, token } = require('../config.json');
+require('dotenv').config();
 
 const client = new Discord.Client();
 const state = {
@@ -74,8 +73,6 @@ client.on('message', (message) => {
     return message.reply('The game has not begun yet!');
   }
 
-  console.log(args);
-
   if (!cooldowns.has(command.name)) {
     cooldowns.set(command.name, new Discord.Collection());
   }
@@ -101,39 +98,22 @@ client.on('message', (message) => {
   setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 
   try {
-    command.execute(message, args, state);
+    command.execute(message, args, state, client);
   } catch (error) {
     console.error(error);
     message.reply('there was an error trying to execute that command!');
   }
 });
 
-client.login(token);
+client.login(process.env.CLIENT_ID);
 
-/*
-  if (msg.content === '!dm') {
-    msg.author.createDM().then(() => {
-      const channel = client.channels.cache.find(
-        (channel) =>
-          channel.type === 'dm' &&
-          channel.recipient.username === msg.author.username
-      );
+// if (command === 'l') {
+//   let textChannels = client.channels.cache.filter((ch) => ch.type === 'text');
 
-      client.channels.cache.get(channel.id).send('Here are your cards!', {
-        files: pokercommands.removeRandomCardsFromDeck(deck, 2),
-      });
-    });
-  }
-
-  if (command === 'l') {
-    let textChannels = client.channels.cache.filter(ch => ch.type === 'text');
-
-    for (const channel of textChannels) {
-      const messages = channel[1].messages.cache;
-      for (const message of messages) {
-        console.log(message.author.username);
-      }
-    }
-  }
-});
-*/
+//   for (const channel of textChannels) {
+//     const messages = channel[1].messages.cache;
+//     for (const message of messages) {
+//       console.log(message.author.username);
+//     }
+//   }
+// }
