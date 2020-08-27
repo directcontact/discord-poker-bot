@@ -10,6 +10,10 @@ const state = {
   status: false,
   decks: [],
   numberOfDecks: 1,
+  master: '',
+  big: 2,
+  small: 1,
+  buyIn: 100,
 };
 
 client.commands = new Discord.Collection();
@@ -71,7 +75,7 @@ client.on('message', (message) => {
     return message.channel.send(reply);
   }
 
-  if (commandName !== 'start' && !state.status) {
+  if (command.game && !state.status) {
     return message.reply('The game has not begun yet!');
   }
 
@@ -100,7 +104,7 @@ client.on('message', (message) => {
   setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 
   try {
-    command.execute(message, args, state, client);
+    command.execute(message, args, state);
   } catch (error) {
     console.error(error);
     message.reply('there was an error trying to execute that command!');

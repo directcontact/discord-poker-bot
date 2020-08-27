@@ -4,8 +4,10 @@ const constants = require('../constants/poker-constants');
 module.exports = {
   name: 'deal',
   description: 'Deals three cards to the river.',
-  execute(message, args, state, client) {
+  game: true,
+  execute(message, args, state) {
     state.decks = pokercommands.initializeDeck(constants);
+    const client = message.client;
 
     message.author.createDM().then(() => {
       const channel = client.channels.cache.find(

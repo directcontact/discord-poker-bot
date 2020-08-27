@@ -9,6 +9,7 @@ module.exports = {
   name: 'add',
   description: 'Adds chips to the user',
   args: true,
+  game: true,
   execute(message, args, state) {
     const value = parseInt(args[0]);
 

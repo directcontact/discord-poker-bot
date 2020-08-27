@@ -9,6 +9,7 @@ const db = new Database(path.resolve('data/poker.db'));
 module.exports = {
   name: 'chips',
   description: 'Returns the number of chips held by the user.',
+  game: true,
   execute(message) {
     let chips = queries.getChips(db, message.author.username, PLAYERS);
     message.reply(`You have ${chips} chips!`);

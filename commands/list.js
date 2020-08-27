@@ -8,6 +8,7 @@ const db = new Database(path.resolve('data/poker.db'));
 module.exports = {
   name: 'list',
   description: 'Lists all of the current profiles within the profiles table.',
+  game: true,
   execute(message) {
     let profiles = queries.listRows(db, PROFILES);
 

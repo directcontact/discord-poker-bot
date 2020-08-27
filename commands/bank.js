@@ -9,6 +9,7 @@ const db = new Database(path.resolve('data/poker.db'));
 module.exports = {
   name: 'bank',
   description: 'Returns your chips that are currently stored in the bank.',
+  game: false,
   execute(message) {
     if (queries.tableEntryExists(db, message.author.username, PROFILES)) {
       let chips = queries.getChips(db, message.author.username, PROFILES);

@@ -10,6 +10,8 @@ module.exports = {
   name: 'withdraw',
   description:
     "Withdraws money from the user's bank and inserts the money into their current holding.",
+  args: true,
+  game: true,
   execute(message, args, state) {
     const value = parseInt(args[0]);
 

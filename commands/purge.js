@@ -6,6 +6,7 @@ const queries = require('../src/db-queries');
 module.exports = {
   name: 'purge',
   description: 'Purges the chat of the messages.',
+  game: false,
   execute(message, args) {
     const deleteNum = parseInt(args[0]);
 

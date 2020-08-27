@@ -8,6 +8,7 @@ const db = new Database(path.resolve('data/poker.db'));
 module.exports = {
   name: 'start',
   description: 'Begins the game, starts up and initializes all values.',
+  game: false,
   execute(message, args, state) {
     message.channel.send('The game will start');
     state.status = true;
