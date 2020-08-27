@@ -15,9 +15,19 @@ module.exports = {
 
   createPlayerTable(db) {
     const query = db.prepare(
-      'CREATE TABLE IF NOT EXISTS players (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER);'
+      'CREATE TABLE IF NOT EXISTS players (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER, cards TEXT);'
     );
     query.run();
+  },
+
+  setCards(db, user, cards) {
+    let query = db.prepare(`UPDATE players SET cards=? WHERE name=?;`);
+    query.run(cards.toString(), user);
+  },
+
+  getCards(db, user) {
+    let query = db.prepare(`SELECT cards from players WHERE name=?;`);
+    return query.get(user).cards;
   },
 
   getChips(db, user, table) {

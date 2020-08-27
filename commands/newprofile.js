@@ -9,6 +9,7 @@ const db = new Database(path.resolve('data/poker.db'));
 module.exports = {
   name: 'newprofile',
   description: 'Creates a new profile for the author of the message.',
+  game: false,
   execute(message) {
     if (!queries.tableEntryExists(db, message.author.username, PROFILES)) {
       queries.addTableEntry(db, message.author.username, PROFILES);
