@@ -25,7 +25,6 @@ module.exports = {
       let hand = pokercommands.randomCardsFromDeck(state.deck, 2);
       queries.setCards(db, message.author.username, hand);
       let files = [];
-      console.log(state.deck);
       hand.map((card) => {
         files.push(pokercommands.getCard(card, constants));
       });
