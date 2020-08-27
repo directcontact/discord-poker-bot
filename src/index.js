@@ -8,8 +8,7 @@ const { PREFIX } = require('../constants/game-constants');
 const client = new Discord.Client();
 const state = {
   status: false,
-  decks: [],
-  numberOfDecks: 1,
+  deck: [],
   master: '',
   big: 2,
   small: 1,
