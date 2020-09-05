@@ -12,4 +12,5 @@ The project is still in development and being consistently maintained through th
 
 We are still not disclosing the link to add the bot to any discord server as of yet, but you are welcome to fork the repo and run it on a separate bot yourself.
 
-## Sidenote we're all busy so probably will be full of bugs and not finished, so please be patient!
+
+> Sidenote we're all busy so probably will be full of bugs and not finished, so please be patient!
