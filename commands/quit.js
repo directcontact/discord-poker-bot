@@ -11,8 +11,8 @@ module.exports = {
   description: 'Quits the current game.',
   game: true,
   execute(message, args) {
-    if (queries.tableEntryExists(db, message.author.username, PLAYERS)) {
-      let playerID = queries.getID(db, message.author.username, PLAYERS);
+    if (queries.tableEntryExists(db, message.author.id, PLAYERS)) {
+      let playerID = queries.getID(db, message.author.id, PLAYERS);
       queries.removeTableEntry(db, playerID, PLAYERS);
       message.channel.send(`${message.author.username} has left the table.`);
     } else {

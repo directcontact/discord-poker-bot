@@ -13,6 +13,7 @@ const state = {
   big: 2,
   small: 1,
   buyIn: 100,
+  river: [],
 };
 
 client.commands = new Discord.Collection();

@@ -11,7 +11,7 @@ module.exports = {
   description: 'Returns the number of chips held by the user.',
   game: true,
   execute(message) {
-    let chips = queries.getChips(db, message.author.username, PLAYERS);
+    let chips = queries.getChips(db, message.author.id, PLAYERS);
     message.reply(`You have ${chips} chips!`);
   },
 };

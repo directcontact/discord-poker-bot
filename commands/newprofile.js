@@ -11,8 +11,8 @@ module.exports = {
   description: 'Creates a new profile for the author of the message.',
   game: false,
   execute(message) {
-    if (!queries.tableEntryExists(db, message.author.username, PROFILES)) {
-      queries.addTableEntry(db, message.author.username, PROFILES);
+    if (!queries.tableEntryExists(db, message.author.id, PROFILES)) {
+      queries.addTableEntry(db, message.author.id, PROFILES);
       message.channel.send(`Profile created for ${message.author.username}!`);
     } else {
       message.channel.send('Profile already exists.');

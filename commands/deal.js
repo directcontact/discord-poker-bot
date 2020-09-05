@@ -18,14 +18,12 @@ module.exports = {
     message.author.createDM().then(() => {
       const channel = client.channels.cache.find(
         (channel) =>
-          channel.type === 'dm' &&
-          channel.recipient.username === message.author.username
+          channel.type === 'dm' && channel.recipient.id === message.author.id
       );
 
       let hand = pokercommands.randomCardsFromDeck(state.deck, 2);
-      queries.setCards(db, message.author.username, hand);
+      queries.setCards(db, message.author.id, hand);
       let files = [];
-      console.log(state.deck);
       hand.map((card) => {
         files.push(pokercommands.getCard(card, constants));
       });

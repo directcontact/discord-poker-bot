@@ -11,8 +11,8 @@ module.exports = {
   description: 'Returns your chips that are currently stored in the bank.',
   game: false,
   execute(message) {
-    if (queries.tableEntryExists(db, message.author.username, PROFILES)) {
-      let chips = queries.getChips(db, message.author.username, PROFILES);
+    if (queries.tableEntryExists(db, message.author.id, PROFILES)) {
+      let chips = queries.getChips(db, message.author.id, PROFILES);
       message.reply(`You have ${chips} chips in the bank!`);
     } else {
       message.send('You dont have a profile yet.');

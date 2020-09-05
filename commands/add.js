@@ -19,7 +19,7 @@ module.exports = {
       'profiles'
     );
     if (exists) {
-      queries.addChips(db, message.author.username, value, 'profiles');
+      queries.addChips(db, message.author.id, value, 'profiles');
       message.channel.send(`Added ${value} chips to your account!`);
     } else {
       message.channel.send('You do not have a profile yet!');

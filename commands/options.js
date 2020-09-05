@@ -3,7 +3,7 @@ module.exports = {
   description: 'Allows the user to change the options of the game.',
   game: true,
   args: true,
-  usage: '[command numberOfDecks big small buyIn]',
+  usage: '[command big small buyIn]',
   execute(message, args, state) {
     if (message.author.id === state.master) {
       if (args.length === 3) {
