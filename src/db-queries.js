@@ -1,110 +1,110 @@
 module.exports = {
-  setChips(db, user, value, table) {
-    let command = `UPDATE ${table} SET chips=? WHERE name=?;`;
+  setChips(db, id, value, table) {
+    let command = `UPDATE ${table} SET chips=? WHERE user_id=?;`;
     // let update = this.getChips(db, user, table) + parseInt(value);
     let query = db.prepare(command);
-    query.run(value, user);
+    query.run(value, id);
   },
 
   createProfileTable(db) {
     const query = db.prepare(
-      'CREATE TABLE IF NOT EXISTS profiles (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER);'
+      'CREATE TABLE IF NOT EXISTS profiles (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, user_id INTEGER, chips INTEGER);'
     );
     query.run();
   },
 
   createPlayerTable(db) {
     const query = db.prepare(
-      'CREATE TABLE IF NOT EXISTS players (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, name TEXT, chips INTEGER, cards TEXT);'
+      'CREATE TABLE IF NOT EXISTS players (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, user_id INTEGER, chips INTEGER, cards TEXT);'
     );
     query.run();
   },
 
   setCards(db, user, cards) {
-    let query = db.prepare(`UPDATE players SET cards=? WHERE name=?;`);
+    let query = db.prepare(`UPDATE players SET cards=? WHERE user_id=?;`);
     query.run(cards.toString(), user);
   },
 
-  getCards(db, user) {
-    let query = db.prepare(`SELECT cards from players WHERE name=?;`);
-    return query.get(user).cards;
+  getCards(db, id) {
+    let query = db.prepare(`SELECT cards from players WHERE user_id=?;`);
+    return query.get(id).cards;
   },
 
-  getChips(db, user, table) {
-    let command = `SELECT chips FROM ${table} WHERE name=?;`;
+  getChips(db, id, table) {
+    let command = `SELECT chips FROM ${table} WHERE user_id=?;`;
     let query = db.prepare(command);
-    let chips = query.get(user);
+    let chips = query.get(id);
     return parseInt(chips.chips);
   },
 
-  addChips(db, user, value, table) {
-    let sum = parseInt(value) + this.getChips(db, user, table);
-    let command = `UPDATE ${table} SET chips=? WHERE name=?;`;
+  addChips(db, id, value, table) {
+    let sum = parseInt(value) + this.getChips(db, id, table);
+    let command = `UPDATE ${table} SET chips=? WHERE user_id=?;`;
     let query = db.prepare(command);
-    query.run(sum, user);
+    query.run(sum, id);
   },
 
-  tableEntryExists(db, user, table) {
-    let command = `SELECT name FROM ${table} WHERE name=?;`;
+  tableEntryExists(db, id, table) {
+    let command = `SELECT user_id FROM ${table} WHERE user_id=?;`;
     let query = db.prepare(command);
-    const valid = query.get(user);
+    const valid = query.get(id);
     return valid !== undefined;
   },
 
   getUserCount(db, table) {
-    let command = `SELECT COUNT(DISTINCT name) FROM ${table};`;
+    let command = `SELECT COUNT(DISTINCT user_id) FROM ${table};`;
     let query = db.prepare(command);
     const result = query.get();
     return result[Object.keys(result)[0]];
   },
 
-  addTableEntry(db, user, table) {
-    let command = `INSERT INTO ${table}(name, chips) VALUES (?,?);`;
+  addTableEntry(db, id, table) {
+    let command = `INSERT INTO ${table}(user_id, chips) VALUES (?,?);`;
     let query = db.prepare(command);
-    query.run(user, 0);
+    query.run(id, 0);
   },
 
   deleteTable(db, table) {
-    let command = `DELETE FROM ${table};`;
+    let command = `DROP TABLE ${table};`;
     let query = db.prepare(command);
     query.run();
   },
 
-  getID(db, user, table) {
-    let command = `SELECT id FROM ${table} WHERE name=?;`;
+  getID(db, id, table) {
+    let command = `SELECT id FROM ${table} WHERE user_id=?;`;
     let query = db.prepare(command);
-    const result = query.get(user);
+    const result = query.get(id);
     return result ? result[Object.keys(result)[0]] : 'N/A';
   },
 
   removeTableEntry(db, id, table) {
-    let command = `DELETE FROM ${table} WHERE id=?;`;
+    let command = `DELETE FROM ${table} WHERE user_id=?;`;
     let query = db.prepare(command);
     query.run(id);
   },
 
   listRows(db, table) {
     let players = [];
-    let command = `SELECT name FROM ${table};`;
+    let command = `SELECT user_id FROM ${table};`;
     let query = db.prepare(command);
 
     for (const player of query.iterate()) {
-      players.push(player.name);
+      players.push(player.id);
     }
 
     return players;
   },
 
-  transferChips(db, user, value, originTable, destinationTable) {
-    this.addChips(db, user, value, destinationTable);
-    this.addChips(db, user, -Math.abs(value), originTable);
+  transferChips(db, id, value, originTable, destinationTable) {
+    this.addChips(db, id, value, destinationTable);
+    this.addChips(db, id, -Math.abs(value), originTable);
   },
 
-  cashOutChips(db, users) {
-    for (name of users) {
-      let chips = this.getChips(db, name, 'players');
-      this.transferChips(db, name, chips, 'players', 'profiles');
-      console.log('Transferred ' + chips + ' to ' + name);
+  cashOutChips(db, ids) {
+    for (id of ids) {
+      let chips = this.getChips(db, id, 'players');
+      this.transferChips(db, id, chips, 'players', 'profiles');
+      console.log('Transferred ' + chips + ' to ' + id);
     }
   },
 };

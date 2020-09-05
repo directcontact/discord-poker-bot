@@ -16,7 +16,7 @@ module.exports = {
   game: true,
   execute(message, args, state) {
     // Check if the profile for the user exists
-    if (queries.tableEntryExists(db, message.author.username, PROFILES)) {
+    if (queries.tableEntryExists(db, message.author.id, PROFILES)) {
       let count = queries.getUserCount(db, PLAYERS);
 
       // Check if the count is at max player capacity.
@@ -24,10 +24,10 @@ module.exports = {
         message.channel.send('The game is full');
         // Otherwise, check if the profile is a player, or add them to the game.
       } else {
-        if (queries.tableEntryExists(db, message.author.username, PLAYERS)) {
+        if (queries.tableEntryExists(db, message.author.id, PLAYERS)) {
           message.channel.send('Youre already in');
         } else {
-          queries.addTableEntry(db, message.author.username, PLAYERS);
+          queries.addTableEntry(db, message.author.id, PLAYERS);
           message.channel.send(
             `(${count + 1}/${MAX_PLAYERS}) ${
               message.author.username

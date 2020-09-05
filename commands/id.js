@@ -11,11 +11,7 @@ module.exports = {
   description: 'Returns the current profile and player ids of the user.',
   game: false,
   execute(message, args) {
-    console.log(
-      'Profiles: ' + queries.getID(db, message.author.username, PROFILES)
-    );
-    console.log(
-      'Players: ' + queries.getID(db, message.author.username, PLAYERS)
-    );
+    console.log('Profiles: ' + queries.getID(db, message.author.id, PROFILES));
+    console.log('Players: ' + queries.getID(db, message.author.id, PLAYERS));
   },
 };
