@@ -42,17 +42,18 @@ for (const file of commandFiles) {
 }
 
 client.on('message', (message) => {
-  if (!message.content.startsWith(PREFIX) || message.author.bot) return;
-
   // vERY iMPOrTANt ---- DONT DELETE
   if (
-    message.content.search('rework') >= 0 ||
-    message.content.search('refactor') >= 0
+    (message.content.search('rework') >= 0 ||
+      message.content.search('refactor') >= 0) &&
+    !message.author.bot
   ) {
     message.channel.send('Did you say, rework?', {
       files: ['./images/smallgif.gif'],
     });
   }
+
+  if (!message.content.startsWith(PREFIX) || message.author.bot) return;
 
   const args = message.content.slice(PREFIX.length).trim().split(/ +/);
   const commandName = args.shift().toLowerCase();
@@ -111,15 +112,27 @@ client.on('message', (message) => {
   }
 });
 
+client.on('guildCreate', (guild) => {
+  const channels = guild.channels.cache.filter(
+    (channel) => channel.type == 'text'
+  );
+
+  let embed = new Discord.MessageEmbed()
+    .setTitle("Hello! I'm Poker Bot!")
+    .setDescription(
+      `
+        I\'m here to help you facilitate poker games!
+
+        If you need any help, just use the **!help** command and it will list all the available commands.
+
+        Every player will have to type **!newprofile** to create a profile with chips so that you can start to play!
+      `
+    );
+
+  channels
+    .first()
+    .send(embed)
+    .catch((e) => console.log(e));
+});
+
 client.login(process.env.CLIENT_ID);
-
-// if (command === 'l') {
-//   let textChannels = client.channels.cache.filter((ch) => ch.type === 'text');
-
-//   for (const channel of textChannels) {
-//     const messages = channel[1].messages.cache;
-//     for (const message of messages) {
-//       console.log(message.author.username);
-//     }
-//   }
-// }

@@ -11,6 +11,7 @@ module.exports = {
   game: false,
   execute(message, args, state) {
     message.channel.send('The game will start');
+    state.deck = new Array(52).fill(false);
     state.status = true;
     queries.createPlayerTable(db);
     queries.createProfileTable(db);
